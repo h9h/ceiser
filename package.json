@@ -75,12 +75,14 @@
       "quotes": [
         "error",
         "single"
-      ]
+      ],
+      "no-console": "warn"
     },
     "env": {
       "browser": true,
       "node": true,
-      "jest": true
+      "jest": true,
+      "es6": true
     }
   },
   "scripts": {
@@ -90,7 +92,7 @@
     "build": "babel src/ -d lib/",
     "prepare": "yarn run build",
     "prepublishOnly": "yarn test && yarn lint && yarn test:lib",
-    "test": "jest",
+    "test": "set ROARR_LOG=true && jest",
     "test:lib": "yarn prepare && jest --config=./jest.lib.config.json"
   },
   "devDependencies": {
@@ -109,6 +111,9 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
-    "fast-xml-parser": "^3.12.5"
+    "fast-xml-parser": "^3.12.5",
+    "jszip": "^3.1.5",
+    "roarr": "^2.11.6",
+    "serialize-error": "^3.0.0"
   }
 }
