@@ -1,0 +1,9 @@
+{
+  "verbose": true,
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/src/",
+    "Users/"
+  ],
+  "collectCoverage": false
+}

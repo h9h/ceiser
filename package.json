@@ -1,0 +1,114 @@
+{
+  "name": "ceiser",
+  "version": "0.1.0",
+  "repository": "https://github.com/h9h/ceiser.git",
+  "main": "./lib/index.js",
+  "description": "Use CEISeR Data",
+  "keywords": [
+    "ceiser",
+    "xml"
+  ],
+  "author": {
+    "name": "Michael Heinke",
+    "email": "m@h9h.de"
+  },
+  "license": "MIT",
+  "files": [
+    "./lib/**"
+  ],
+  "jest": {
+    "verbose": true,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/",
+      "Users/"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/testdata/**",
+      "!**/coverage/**",
+      "!**/lib/**",
+      "!**/index.js"
+    ]
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-flow"
+      ],
+      [
+        "@babel/env",
+        {
+          "targets": {
+            "edge": "17",
+            "firefox": "60",
+            "chrome": "67",
+            "safari": "11.1"
+          },
+          "useBuiltIns": "usage"
+        }
+      ]
+    ],
+    "plugins": [
+      "@babel/plugin-syntax-flow",
+      "@babel/plugin-transform-arrow-functions"
+    ]
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {}
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "semi": [
+        "error",
+        "never",
+        {
+          "beforeStatementContinuationChars": "always"
+        }
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ]
+    },
+    "env": {
+      "browser": true,
+      "node": true,
+      "jest": true
+    }
+  },
+  "scripts": {
+    "lint": "eslint ./src",
+    "fix": "eslint --fix ./src",
+    "flow": "flow",
+    "build": "babel src/ -d lib/",
+    "prepare": "yarn run build",
+    "prepublishOnly": "yarn test && yarn lint && yarn test:lib",
+    "test": "jest",
+    "test:lib": "yarn prepare && jest --config=./jest.lib.config.json"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-syntax-flow": "^7.0.0",
+    "@babel/plugin-transform-arrow-functions": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-flow": "^7.0.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.6.0",
+    "eslint": "^5.8.0",
+    "flow-bin": "^0.83.0",
+    "jest": "^23.6.0"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "fast-xml-parser": "^3.12.5"
+  }
+}
