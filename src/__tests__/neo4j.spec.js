@@ -7,4 +7,12 @@ describe('neo4j / Neode', () => {
 
     expect(a).toBe(b)
   })
+
+  // it('should get some data', (done) => {
+  //   const n = neode.getInstance()
+  //   n.builder.match('c', 'ServiceNamespace').return('c').execute().then(res => {
+  //     console.log(res.records)
+  //     done()
+  //   })
+  // })
 })

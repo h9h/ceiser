@@ -1,5 +1,6 @@
 import { getJsonModel } from '../data-zip'
 import Logger from '../Logger'
+import util from 'util'
 
 const log = Logger('data-zip.spec')
 
@@ -11,7 +12,7 @@ describe('CEISeR`s data.zip', () => {
         expect(jsons[0]).toBeDefined()
         expect(jsons[17654]).toBeDefined()
         expect(jsons[5555].OperationQosProfile.name).toEqual('getBenutzerdaten')
-        console.log(jsons[5555]) // eslint-disable-line no-console
+        console.log(util.inspect(jsons[5555], false, null)) // eslint-disable-line no-console
         done()
       })
       .catch(error => {
