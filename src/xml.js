@@ -1,7 +1,4 @@
-import Logger from './Logger'
 import { parse as fastparse } from 'fast-xml-parser'
-
-const log = Logger('xml')
 
 const PARSE_OPTIONS = {
   attributeNamePrefix: '', // default @
@@ -25,6 +22,5 @@ const PARSE_OPTIONS = {
 }
 
 export const parse = (xml, options = PARSE_OPTIONS): {} => {
-  log.info(`Parsing '${xml.substring(0,80)}...'`)
   return fastparse(xml, options)
 }
