@@ -14,10 +14,12 @@ describe('handling von Zip-Datei', () => {
     })
   }, 2000)
 
-  it('should read zip-file entries', function (done) {
-    readEntries('./data/data.zip', name => name === 'de/svi/xsd/beratung/candidate/ei/common/v1@ServiceNamespace.xceiser')
+  it('should read zip-file entries (single entry)', function (done) {
+    readEntries('./data/data.zip', {
+      filterFunction: name => name === 'de/svi/xsd/beratung/candidate/ei/common/v1@ServiceNamespace.xceiser'
+    })
       .then(contents => {
-        log.info({ contents }, 'Read contents')
+        log.info({contents}, 'Read contents')
         expect(contents.length).toBe(1)
         done()
       })
@@ -26,4 +28,49 @@ describe('handling von Zip-Datei', () => {
         done(error)
       })
   }, 2000)
+
+  it('should read zip-file entries (default entries)', function (done) {
+    readEntries('./data/data.zip')
+      .then(contents => {
+        log.info({contentsLength: contents.length}, 'Read contents')
+        expect(contents.length).toBe(17655)
+        done()
+      })
+      .catch(error => {
+        log.error(error, 'Test failed')
+        done(error)
+      })
+  }, 10000)
+
+  it('should apply filterfunction', function (done) {
+    readEntries('./data/data.zip', {filterFunction: name => name.match(/.*ServiceNamespace.xceiser$/)})
+      .then(contents => {
+        log.info({contentsLength: contents.length}, 'Read contents')
+        expect(contents.length).toBe(2439)
+        done()
+      })
+      .catch(error => {
+        log.error(error, 'Test failed')
+        done(error)
+      })
+  }, 10000)
+
+  it('should apply filterFunction and applyFunction', function (done) {
+    readEntries('./data/data.zip', {
+      filterFunction: name => name.match(/.*ServiceNamespace.xceiser$/),
+      applyFunction: content => content.substring(0, 100)
+    })
+      .then(contents => {
+        log.info({contentsLength: contents.length}, 'Read contents')
+        expect(contents.length).toBe(2439)
+        expect(contents[0].length).toBe(100)
+        expect(contents[30].length).toBe(100)
+        expect(contents[2438].length).toBe(100)
+        done()
+      })
+      .catch(error => {
+        log.error(error, 'Test failed')
+        done(error)
+      })
+  }, 10000)
 })
