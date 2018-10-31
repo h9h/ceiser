@@ -53,7 +53,8 @@
     ],
     "plugins": [
       "@babel/plugin-syntax-flow",
-      "@babel/plugin-transform-arrow-functions"
+      "@babel/plugin-transform-arrow-functions",
+      "@babel/plugin-proposal-class-properties"
     ]
   },
   "eslintConfig": {
@@ -110,6 +111,7 @@
     "jest": "^23.6.0"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/polyfill": "^7.0.0",
     "fast-xml-parser": "^3.12.5",
     "jszip": "^3.1.5",
