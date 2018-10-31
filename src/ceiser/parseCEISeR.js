@@ -1,5 +1,5 @@
-import { throwParseError } from './Error'
-import Logger from './Logger'
+import { throwParseError } from '../Error'
+import Logger from '../Logger'
 
 const log = Logger('data-parseCEISeR')
 
@@ -34,6 +34,7 @@ export const parseJSON = (json, parentFqn) => {
 
     return flatten(Object.keys(json).map(key => {
       const sub = json[key]
+
       if (Array.isArray(sub)) {
         return sub.map(item => createNode(key, item, parentFqn))
       } else {
@@ -43,7 +44,11 @@ export const parseJSON = (json, parentFqn) => {
   } else {
     const content = json[label]
 
-    return createNode(label, content, parentFqn)
+    if (Array.isArray(content)) {
+      return content.map(item => createNode(label, item, parentFqn))
+    } else {
+      return createNode(label, content, parentFqn)
+    }
   }
 }
 

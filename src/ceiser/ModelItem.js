@@ -1,0 +1,5 @@
+class ModelItem {
+  constructor(structuredJSON) {
+
+  }
+}
