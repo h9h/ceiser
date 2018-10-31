@@ -5,7 +5,8 @@ import { parse } from '../../xml'
 
 const FILES = [
   'data/leben/LebenVertragAuskunft1/LebenVertragAuskunftPortType1@WSDL11ServiceInterface.xceiser',
-  'data/leben/PartnerDublettenBereinigung1@ServiceNamespace.xceiser'
+  'data/leben/PartnerDublettenBereinigung1@ServiceNamespace.xceiser',
+  'data/komposit/ICIS@Application.xceiser'
 ]
 describe('Parse CEISeR JSONs from XMLs', () => {
   let JSONs
@@ -27,6 +28,12 @@ describe('Parse CEISeR JSONs from XMLs', () => {
 
   it('should get structure from JSON 1', function () {
     const node = parseJSON(JSONs[1], '')
+
+    console.log(util.inspect(node, false, null)) // eslint-disable-line no-console
+  })
+
+  it('should get structure from JSON 2', function () {
+    const node = parseJSON(JSONs[2], '')
 
     console.log(util.inspect(node, false, null)) // eslint-disable-line no-console
   })

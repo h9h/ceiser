@@ -1,5 +1,8 @@
-import Neode from 'neode'
+import seraph from 'seraph'
+import model from 'seraph-model'
 import Logger from './Logger'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const log = Logger('neo4j')
 
@@ -7,21 +10,21 @@ const Singleton = (() => {
   let instance
 
   const createInstance = () => {
-    log.info('---> Creating Neode Instance <---')
-    const n = new Neode.fromEnv()
-
-    n.withDirectory(__dirname + '/models')
+    log.info('---> Creating Neo4j Driver Instance <---')
+    const n = seraph({
+      user: process.env.NEO4J_USERNAME,
+      pass: process.env.NEO4J_PASSWORD,
+    })
 
     return {
-      neode: n,
-      model: modelname => n.model(modelname),
-      builder: n.query()
+      db: n,
+      model: modelname => model(n, modelname),
     }
   }
 
   return {
     getInstance: () => {
-      log.trace('---> Getting Neode Instance <---')
+      log.trace('---> Getting Neo4j Driver Instance <---')
       if (!instance) {
         instance = createInstance()
       }
