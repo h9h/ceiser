@@ -6,11 +6,8 @@ dotenv.config()
 
 const log = Logger('graphdb')
 
-export const toObject = record => {
-  const result = {}
-  record.forEach((value, key) => result[key] = value)
-  return result
-}
+const NOOP = () => {}
+const LOG_ERROR = (errror) => log.error(error, 'DB Call failed')
 
 const Singleton = (() => {
   let instance
@@ -20,23 +17,21 @@ const Singleton = (() => {
     const driver = neo4j.driver('bolt://' + process.env.NEO4J_HOST,
       neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD))
 
-    const sessionRun = (cypher, params, resolve, reject) => {
+    const sessionRun = (cypher, params, resolve = NOOP, reject = LOG_ERROR) => {
       const session = driver.session()
       session.run(cypher, params).then(result => {
         resolve(result)
         session.close()
       }).catch(error => {
         reject(error)
-        log.error(error, `Cypher '${cypher}' failed`)
       })
     }
 
-    const txRun = (tx) => (cypher, params, resolve, reject) => {
+    const txRun = (tx) => (cypher, params, resolve = NOOP, reject = LOG_ERROR) => {
       tx.run(cypher, params).then(result => {
         resolve(result)
       }).catch(error => {
         reject(error)
-        log.error(error, `Cypher '${cypher}' failed`)
       })
     }
 
@@ -45,7 +40,7 @@ const Singleton = (() => {
       const tx = session.beginTransaction()
       return {
         run: txRun,
-        commit: (resolve, reject) => tx.commit().then(result => {
+        commit: (resolve) => tx.commit().then(result => {
           resolve(result)
           session.close()
         }),

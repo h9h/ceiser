@@ -1,4 +1,4 @@
-import graphdb, { toObject } from '../graphdb'
+import graphdb from '../graphdb'
 
 describe('graphdb', () => {
   let db
@@ -31,11 +31,33 @@ describe('graphdb', () => {
         expect(rec.keys).toEqual(['name'])
         expect(rec._fields).toEqual(['First Item'])
         expect(rec._fieldLookup).toEqual({ name: 0 })
-        expect(toObject(rec)).toEqual({ name: 'First Item'})
+        expect(rec.toObject()).toEqual({ name: 'First Item'})
         done()
       },
       logAndDone(done),
     )
+  })
+
+  it('should run transactions', function (done) {
+    const tx = db.transaction()
+
+    tx.run(
+      'CREATE (n:Transaction {name: {nameParam}}) RETURN n.name as name',
+      { nameParam: 'First Transaction' },
+      result => {
+        expect(result.records.length).toBe(1)
+        const rec = result.records[0]
+        expect(rec.keys).toEqual(['name'])
+        expect(rec._fields).toEqual(['First Item'])
+        expect(rec._fieldLookup).toEqual({ name: 0 })
+        expect(rec.toObject()).toEqual({ name: 'First Transaction'})
+      },
+    )
+
+    tx.commit(result => {
+      console.dir(result)
+      done()
+    }, logAndDone)
   })
   // it('should get some data', (done) => {
   //   const n = neode.getInstance()
