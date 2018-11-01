@@ -10,7 +10,7 @@ export const createIndex = label => `CREATE INDEX ON :${label}(fqn)`
 const createOrUpdateNode = (label, properties) => {
   if (!properties.fqn) throw new Error('Field fqn is missing from properties')
 
-  const params = Object.keys(properties).filter(key => !['fqn'].includes(key))
+  const params = Object.keys(properties).filter(key => !['fqn', 'password', 'passwort'].includes(key))
 
   if (params.length > 0) {
     return `
