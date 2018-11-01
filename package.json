@@ -116,9 +116,8 @@
     "dotenv": "^6.1.0",
     "fast-xml-parser": "^3.12.5",
     "jszip": "^3.1.5",
+    "neo4j-driver": "^1.7.0",
     "roarr": "^2.11.6",
-    "seraph": "^0.15.3",
-    "seraph-model": "^0.10.1",
     "serialize-error": "^3.0.0"
   }
 }
