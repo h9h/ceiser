@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 const map = properties => {
-  const keys = Object.keys(properties).filter(key => !['fqn'].includes(key)).map(key => `${key}: {${key}}`)
+  const keys = Object.keys(properties).map(key => `${key}: {${key}}`)
   return `{ ${keys.join(', ')} }`
 }
 
@@ -10,12 +10,12 @@ export const createIndex = label => `CREATE INDEX ON :${label}(fqn)`
 const createOrUpdateNode = (label, properties) => {
   if (!properties.fqn) throw new Error('Field fqn is missing from properties')
 
-  const params = Object.keys(properties).filter(key => !['fqn'].includes(key))
+  const params = Object.keys(properties).filter(key => !['fqn', 'password', 'passwort'].includes(key))
 
   if (params.length > 0) {
     return `
 MERGE (n:${label} { fqn: {fqn} })
-ON MATCH SET n += ${map(properties)}`
+ON MATCH SET n += ${map(params)}`
   } else {
     return `MERGE (n:${label} { fqn: {fqn} })`
   }
