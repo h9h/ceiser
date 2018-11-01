@@ -1,4 +1,4 @@
-import { getJsonModel } from '../data-zip'
+import { getJsonModel, zipToNeo4j } from '../data-zip'
 import Logger from '../Logger'
 import util from 'util'
 
@@ -19,5 +19,9 @@ describe('CEISeR`s data.zip', () => {
         log.error(error, 'Reading data.zip into json failed')
       })
   }, 120000) // Timeout 2 minutes
+
+  it('should write to neo/file', (done) => {
+    zipToNeo4j(null, undefined, done)
+  }, 360000) // 6 minutes
 })
 
