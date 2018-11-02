@@ -7,7 +7,7 @@ const createNode = (label, content, parentFqn) => {
   const namespace = content.namespace || parentFqn
   const fqn = getFqn(content, namespace)
   const properties = getProperties(content)
-  const relatedBy = getRelations(content, parentFqn)
+  const relatedBy = getRelations(content, fqn)
 
   const node = {
     label,
@@ -18,7 +18,7 @@ const createNode = (label, content, parentFqn) => {
   if (Object.keys(properties).length > 0) node.properties = properties
   if (relatedBy.length > 0) node.relatedBy = relatedBy
 
-  log.trace({content, node}, 'Finished parsing json, returning structure')
+  log.trace({content, node}, 'Finished parsing json, returning node')
   return node
 }
 

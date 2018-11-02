@@ -10,9 +10,11 @@ export const createIndex = label => `CREATE INDEX ON :${label}(fqn)`
 const createOrUpdateNode = (label, properties) => {
   if (!properties.fqn) throw new Error('Field fqn is missing from properties')
 
-  const params = Object.keys(properties).filter(key => !['fqn', 'password', 'passwort'].includes(key))
+  const keepKeys = Object.keys(properties).filter(key => !['fqn', 'password', 'passwort'].includes(key))
+  const params = {}
+  keepKeys.forEach(k => params[k] = properties[k])
 
-  if (params.length > 0) {
+  if (keepKeys.length > 0) {
     return `
 MERGE (n:${label} { fqn: {fqn} })
 ON MATCH SET n += ${map(params)}`
@@ -52,10 +54,15 @@ class Command {
 export class Commands {
   constructor() {
     this.commands = []
+    this.labels = new Set()
   }
 
   add = command => {
     this.commands.push(command)
+  }
+
+  addLabel = label => {
+    this.labels.add(label)
   }
 
   getCommands = type => this.commands.filter(e => e.getType() === type)
@@ -73,10 +80,13 @@ export class Commands {
     })
 
     try {
+      this.labels.forEach(label => {
+        ws.write(`${createIndex(label)};\n`)
+      });
       ['Node', 'Reference', 'Relation'].forEach(type => {
         this.commands.filter(command => command.getType() === type).forEach(command => {
           if (command.getResolvedCommand) {
-            ws.write(`${command.getResolvedCommand()}\n`)
+            ws.write(`${command.getResolvedCommand()};\n`)
           } else {
             console.log('>>>>> COMMAND: ', command)
           }
@@ -90,6 +100,9 @@ export class Commands {
   }
 
   writeToConsole = () => {
+    this.labels.forEach(label => {
+      console.log(createIndex(label))
+    })
     this.commands.forEach(command => {
       if (command.getResolvedCommand) {
         console.log(`${command.getResolvedCommand()}`)
@@ -115,6 +128,8 @@ const parseNextElement = (commands, structure, labelFrom, fqnFrom) => {
         const { label, fqn } = structure
         const properties = structure.properties || {}
         const params = { fqn, ...properties }
+
+        commands.addLabel(label)
         commands.add(new Command(type, createOrUpdateNode(label, params).replace(/\n/g, ' '), params))
 
         if (structure.relatedBy) {
@@ -131,7 +146,6 @@ const parseNextElement = (commands, structure, labelFrom, fqnFrom) => {
       {
         const { label, relatedTo } = structure
         const nodes = Array.isArray(relatedTo) ? relatedTo : [relatedTo]
-
         nodes.forEach(node => {
           const properties = { fqnFrom, fqnTo: node.fqn }
           commands.add(new Command(type, relateNodes(labelFrom, label, node.label, properties).replace(/\n/g, ' '), properties))

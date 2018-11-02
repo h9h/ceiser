@@ -14,13 +14,8 @@ const PARSE_OPTIONS = {
   cdataPositionChar: '\\c',
   localeRange: '', //To support non english character in tag/attribute values.
   parseTrueNumberOnly: false,
-  /*
-  // unter Nutzung des HTML-Encoders he:
-  attrValueProcessor: a => he.decode(a, {isAttributeValue: true}),//default is a=>a
-  tagValueProcessor : a => he.decode(a) //default is a=>a
-   */
 }
 
-export const parse = (xml, options = PARSE_OPTIONS): {} => {
+export const parse = (xml, options = PARSE_OPTIONS) => {
   return fastparse(xml, options)
 }
