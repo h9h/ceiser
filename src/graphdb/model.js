@@ -36,7 +36,7 @@ MERGE (from)-[r:${relation}]->(to)`
 }
 
 class Job {
-  constructor (commands, includeIndices = false, batchSize = 1000) {
+  constructor (commands, includeIndices, batchSize) {
     this.finishedIndices = !includeIndices
     this.finished = false
     this.index = 0
@@ -111,7 +111,7 @@ export class Commands {
 
   addLabel = label => {
     this.labels.add(label)
-    this.count('Label')
+    this.statistic.Label = this.labels.size
   }
 
   getCommands = type => this.commands.filter(e => e.getType() === type)
@@ -165,8 +165,8 @@ export class Commands {
   }
   /* eslint-enable */
 
-  getJob = () => {
-    return new Job(this)
+  getJob = (includeIndices = false, batchSize = 1000) => {
+    return new Job(this, includeIndices, batchSize)
   }
 }
 

@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+const util = require('util')
 const commandLineArgs = require('command-line-args')
 const commandLineUsage = require('command-line-usage')
 const generateKuK = require('./data-zip').generate
@@ -18,10 +19,8 @@ const mainDefinitions = [
 ]
 const mainoptions = commandLineArgs(mainDefinitions, { stopAtFirstUnknown: true })
 const argv = mainoptions._unknown || []
-console.log(mainoptions, argv)
 
 const command = mainoptions.command
-
 console.log(command, argv)
 
 function File(filename){
@@ -33,7 +32,8 @@ const options = command => {
     case 'generate':
       return [
         { name: 'file', alias: 'f', type: File },
-        { name: 'batchsize', alias: 'b', type: Number}
+        { name: 'indices', alias: 'i', type: Boolean, defaultValue: false },
+        { name: 'batchsize', alias: 'b', type: Number, defaultValue: 1000 }
       ]
     default:
       return []
@@ -90,10 +90,12 @@ const prepare = () => {
 }
 
 const generate = (commandOptions) => {
-  const done = (result) => console.log('Finished. \n' + result)
+  const done = (result) => console.log('Finished. \n' + util.inspect(result, false, null))
   const filename = commandOptions.file.filename
-  console.log('File: ', filename)
-  generateKuK(filename, done)
+  const includeIndices = commandOptions.indices
+  const batchSize = commandOptions.batchsize
+
+  generateKuK(filename, includeIndices, batchSize, done)
 }
 
 const clear = () => {

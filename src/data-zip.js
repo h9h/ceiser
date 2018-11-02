@@ -24,12 +24,12 @@ export const getCyphers = structures => {
   return commands
 }
 
-export const generate = (zipfile, callback) => {
+export const generate = (zipfile, includeIndices, batchSize, callback) => {
   const db = graphdb.getInstance()
-  zipToNeo4j(db, zipfile, callback)
+  zipToNeo4j(db, zipfile, includeIndices, batchSize, callback)
 }
 
-export const zipToNeo4j = (db, zipfile, callback) => {
+export const zipToNeo4j = (db, zipfile, includeIndices, batchSize, callback) => {
   getJsonModel(zipfile).then(async jsons => {
     const structures = getStructures(jsons)
     const commands = getCyphers(structures)
@@ -38,17 +38,18 @@ export const zipToNeo4j = (db, zipfile, callback) => {
       commands.writeFile('cypher-coommands.txt', callback)
     } else {
       let count = 0
-      const job = commands.getJob()
+      const job = commands.getJob(includeIndices, batchSize)
 
+      const now = new Date()
       while (!job.isFinished()) {
         const tx = db.transaction()
 
         job.getBatch().forEach(async command => {
           const {text, params} = command.getCommand()
           const result = await tx.run(text, params)
-          log.trace({ result }, 'Neo4j Cypher command executed')
+          log.trace({ result, command: command.getResolvedCommand() }, 'executed cypher')
           count = count + 1
-          if (count%1000 === 0) console.log(count) // eslint-disable-line no-console
+          if (count%batchSize === 0) console.log(count, (new Date() - now)/1000) // eslint-disable-line no-console
         })
 
         const result = await tx.commit()

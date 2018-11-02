@@ -18,7 +18,7 @@ describe('CEISeR`s data.zip', () => {
   }, 120000) // Timeout 2 minutes
 
   it('should write to neo/file', (done) => {
-    zipToNeo4j(null, undefined, done)
+    zipToNeo4j(null, undefined, false, 1000, done)
   }, 360000) // 6 minutes
 })
 
