@@ -94,7 +94,8 @@
     "prepare": "yarn run build",
     "prepublishOnly": "yarn test && yarn lint && yarn test:lib",
     "test": "set ROARR_LOG=true && jest",
-    "test:lib": "yarn prepare && jest --config=./jest.lib.config.json"
+    "test:lib": "yarn prepare && jest --config=./jest.lib.config.json",
+    "main": "node lib/main"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
@@ -113,6 +114,8 @@
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/polyfill": "^7.0.0",
+    "command-line-args": "^5.0.2",
+    "command-line-usage": "^5.0.5",
     "dotenv": "^6.1.0",
     "fast-xml-parser": "^3.12.5",
     "jszip": "^3.1.5",
