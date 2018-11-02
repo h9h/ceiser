@@ -10,7 +10,8 @@ export const createIndex = label => `CREATE INDEX ON :${label}(fqn)`
 const createOrUpdateNode = (label, properties) => {
   if (!properties.fqn) throw new Error('Field fqn is missing from properties')
 
-  const keepKeys = Object.keys(properties).filter(key => !['fqn', 'password', 'passwort'].includes(key))
+  const keepKeys = Object.keys(properties).
+    filter(key => !['fqn', 'password', 'passwort'].includes(key))
   const params = {}
   keepKeys.forEach(k => params[k] = properties[k])
 
@@ -24,23 +25,59 @@ ON MATCH SET n += ${map(params)}`
 }
 
 const relateNodes = (labelFrom, relation, labelTo, properties) => {
-  if (!properties.fqnFrom) throw new Error('Field fqnFrom is missing from properties')
-  if (!properties.fqnTo) throw new Error('Field fqnTo is missing from properties')
+  if (!properties.fqnFrom) throw new Error(
+    'Field fqnFrom is missing from properties')
+  if (!properties.fqnTo) throw new Error(
+    'Field fqnTo is missing from properties')
   return `
 MATCH (from:${labelFrom} { fqn: {fqnFrom} }),
 (to:${labelTo} { fqn: {fqnTo} })
 MERGE (from)-[r:${relation}]->(to)`
 }
 
+class Job {
+  constructor (commands, includeIndices = false, batchSize = 1000) {
+    this.finishedIndices = !includeIndices
+    this.finished = false
+    this.index = 0
+    this.batchSize = batchSize || 1000
+    this.indexActions = []
+    this.actions = []
+
+    commands.getLabels().forEach(label => {
+      this.indexActions.push(new Command('Index', createIndex(label), {}))
+    })
+
+    ;['Node', 'Reference', 'Relation'].forEach(type => {
+      const sorted = commands.getCommands(type).sort((a, b) => a.text.localeCompare(b.text))
+      sorted.forEach(action => this.actions.push(action))
+    })
+  }
+
+  isFinished = () => this.finished
+
+  getBatch = () => {
+    if (!this.finishedIndices) {
+      this.finishedIndices = true
+      return this.indexActions
+    }
+    const start = this.index
+    const end = Math.min(start + this.batchSize, this.actions.length)
+    this.index = end
+    this.finished = (end === this.actions.length)
+    return this.actions.slice(start, end)
+  }
+}
+
 class Command {
-  constructor(type, text, params) {
+  constructor (type, text, params) {
     this.type = type
     this.text = text
     this.params = params
   }
 
   getType = () => (this.type)
-  getCommand = () => ({ text: this.text, params: this.params })
+  getCommand = () => ({text: this.text, params: this.params})
   getResolvedCommand = () => {
     let result = this.text
     Object.keys(this.params).forEach(key => {
@@ -52,7 +89,7 @@ class Command {
 }
 
 export class Commands {
-  constructor() {
+  constructor () {
     this.commands = []
     this.labels = new Set()
   }
@@ -67,7 +104,9 @@ export class Commands {
 
   getCommands = type => this.commands.filter(e => e.getType() === type)
 
-  writeFile = (filename, cb) =>  {
+  getLabels = () => this.labels
+
+  writeFile = (filename, cb) => {
     const ws = fs.createWriteStream(filename)
     let error = null
 
@@ -84,7 +123,7 @@ export class Commands {
         ws.write(`${createIndex(label)};\n`)
       });
       ['Node', 'Reference', 'Relation'].forEach(type => {
-        this.commands.filter(command => command.getType() === type).forEach(command => {
+        this.getCommands(type).forEach(command => {
           if (command.getResolvedCommand) {
             ws.write(`${command.getResolvedCommand()};\n`)
           } else {
@@ -92,7 +131,7 @@ export class Commands {
           }
         })
       })
-    } catch(error) {
+    } catch (error) {
       cb(error)
     } finally {
       ws.end()
@@ -111,47 +150,53 @@ export class Commands {
       }
     })
   }
+
+  getJob = () => {
+    return new Job(this)
+  }
 }
 
 export const createCyphers = (commands, structure) => {
-  const { label, fqn } = structure
+  const {label, fqn} = structure
   parseNextElement(commands, structure, label, fqn)
 }
 
 const parseNextElement = (commands, structure, labelFrom, fqnFrom) => {
-  const { type } = structure
+  const {type} = structure
 
-  switch(type) {
+  switch (type) {
     case 'Node':
-    case 'Reference':
-      {
-        const { label, fqn } = structure
-        const properties = structure.properties || {}
-        const params = { fqn, ...properties }
+    case 'Reference': {
+      const {label, fqn} = structure
+      const properties = structure.properties || {}
+      const params = {fqn, ...properties}
 
-        commands.addLabel(label)
-        commands.add(new Command(type, createOrUpdateNode(label, params).replace(/\n/g, ' '), params))
+      commands.addLabel(label)
+      commands.add(
+        new Command(type, createOrUpdateNode(label, params).replace(/\n/g, ' '),
+          params))
 
-        if (structure.relatedBy) {
-          const { relatedBy } = structure
-          if (Array.isArray(relatedBy)) {
-            relatedBy.forEach(o => parseNextElement(commands, o, label, fqn))
-          } else {
-            parseNextElement(commands, relatedBy, label, fqn)
-          }
+      if (structure.relatedBy) {
+        const {relatedBy} = structure
+        if (Array.isArray(relatedBy)) {
+          relatedBy.forEach(o => parseNextElement(commands, o, label, fqn))
+        } else {
+          parseNextElement(commands, relatedBy, label, fqn)
         }
       }
+    }
       break
-    case 'Relation':
-      {
-        const { label, relatedTo } = structure
-        const nodes = Array.isArray(relatedTo) ? relatedTo : [relatedTo]
-        nodes.forEach(node => {
-          const properties = { fqnFrom, fqnTo: node.fqn }
-          commands.add(new Command(type, relateNodes(labelFrom, label, node.label, properties).replace(/\n/g, ' '), properties))
-          parseNextElement(commands, node, labelFrom, fqnFrom)
-        })
-      }
+    case 'Relation': {
+      const {label, relatedTo} = structure
+      const nodes = Array.isArray(relatedTo) ? relatedTo : [relatedTo]
+      nodes.forEach(node => {
+        const properties = {fqnFrom, fqnTo: node.fqn}
+        commands.add(new Command(type,
+          relateNodes(labelFrom, label, node.label, properties).
+            replace(/\n/g, ' '), properties))
+        parseNextElement(commands, node, labelFrom, fqnFrom)
+      })
+    }
       break
     default:
       throw new Error(`Unknown type '${type}`)

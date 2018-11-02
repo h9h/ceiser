@@ -1,4 +1,5 @@
 import { getJsonModel, zipToNeo4j } from '../data-zip'
+import graphdb from '../graphdb/graphdb'
 import Logger from '../Logger'
 import util from 'util'
 
@@ -22,6 +23,11 @@ describe('CEISeR`s data.zip', () => {
 
   it('should write to neo/file', (done) => {
     zipToNeo4j(null, undefined, done)
+  }, 360000) // 6 minutes
+
+  it('should write to neo/database', (done) => {
+    const db = graphdb.getInstance()
+    zipToNeo4j(db, undefined, done)
   }, 360000) // 6 minutes
 })
 

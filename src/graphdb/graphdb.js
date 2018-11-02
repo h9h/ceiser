@@ -27,27 +27,31 @@ const Singleton = (() => {
       })
     }
 
-    const txRun = (tx) => (cypher, params, resolve = NOOP, reject = LOG_ERROR) => {
-      tx.run(cypher, params).then(result => {
-        resolve(result)
-      }).catch(error => {
-        reject(error)
-      })
+    const txRun = (tx) => async function (
+      cypher, params, resolve = NOOP, reject = LOG_ERROR) {
+      try {
+        return tx.run(cypher, params)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const txCommit = (session, tx) => async function () {
+      try {
+        const result = await tx.commit()
+        session.close()
+        return result
+      } catch (error) {
+        console.log(error)
+      }
     }
 
     const transaction = () => {
       const session = driver.session()
       const tx = session.beginTransaction()
       return {
-        run: txRun,
-        commit: (resolve) => tx.commit().then(result => {
-          resolve(result)
-          session.close()
-        }),
-        rollback: () => {
-          tx.rollback()
-          session.close()
-        }
+        run: txRun(tx),
+        commit: txCommit(session, tx),
       }
     }
     return {
