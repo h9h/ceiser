@@ -1,4 +1,3 @@
-import util from 'util'
 import graphdb from '../graphdb'
 
 describe('graphdb', () => {
@@ -12,7 +11,7 @@ describe('graphdb', () => {
   })
 
   const logAndDone = done => (args) => {
-    console.log(args)
+    console.log(args) // eslint-disable-line no-console
     done()
   }
   it('should get a single instance', function () {
@@ -39,34 +38,22 @@ describe('graphdb', () => {
     )
   })
 
-  it('should run transactions', function (done) {
+  it('should run transactions', async () => {
     const tx = db.transaction()
 
-    tx.run(
+    const result = await tx.run(
       'CREATE (n:Transaction {name: {nameParam}}) RETURN n.name as name',
-      { nameParam: 'First Transaction' },
-      result => {
-        console.log(util.inspect(result, false, null))
-        expect(result.records.length).toBe(1)
-        const rec = result.records[0]
-        expect(rec.keys).toEqual(['name'])
-        expect(rec._fields).toEqual(['First Transaction'])
-        expect(rec._fieldLookup).toEqual({ name: 0 })
-        expect(rec.toObject()).toEqual({ name: 'First Transaction'})
-      },
-      reject => console.log(reject)
+      {nameParam: 'First Transaction'}
     )
 
-    tx.commit(result => {
-      console.log(util.inspect(result, false, null))
-      done()
-    }, logAndDone)
+    expect(result.records.length).toBe(1)
+
+    const rec = result.records[0]
+    expect(rec.keys).toEqual(['name'])
+    expect(rec._fields).toEqual(['First Transaction'])
+    expect(rec._fieldLookup).toEqual({name: 0})
+    expect(rec.toObject()).toEqual({name: 'First Transaction'})
+
+    await tx.commit()
   })
-  // it('should get some data', (done) => {
-  //   const n = neode.getInstance()
-  //   n.builder.match('c', 'ServiceNamespace').return('c').execute().then(res => {
-  //     console.log(res.records)
-  //     done()
-  //   })
-  // })
 })

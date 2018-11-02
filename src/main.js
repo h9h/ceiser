@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const commandLineArgs = require('command-line-args')
 const commandLineUsage = require('command-line-usage')
 const generateKuK = require('./data-zip').generate
@@ -84,18 +85,18 @@ const help = () => {
   console.log(usage)
 }
 
-const prepare = (commandOptions) => {
+const prepare = () => {
   console.log('prepare t.b.d.')
 }
 
 const generate = (commandOptions) => {
-  const done = (result) => console.log('Finished. ' + result)
+  const done = (result) => console.log('Finished. \n' + result)
   const filename = commandOptions.file.filename
   console.log('File: ', filename)
   generateKuK(filename, done)
 }
 
-const clear = (commandOptions) => {
+const clear = () => {
   console.log('prepare t.b.d.')
 }
 

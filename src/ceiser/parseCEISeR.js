@@ -81,7 +81,7 @@ const getProperties = content => {
 }
 
 const getRelations = (content, parentFqn) => {
-  const entries = Object.entries(content).filter(([_, value]) => typeof value === 'object')
+  const entries = Object.entries(content).filter(([_, value]) => typeof value === 'object') // eslint-disable-line no-unused-vars
 
   return entries.map(([key, value]) => {
     const relatedTo = parseJSON(value, parentFqn)

@@ -7,7 +7,7 @@ dotenv.config()
 const log = Logger('graphdb')
 
 const NOOP = () => {}
-const LOG_ERROR = (errror) => log.error(error, 'DB Call failed')
+const LOG_ERROR = (error) => log.error(error, 'DB Call failed')
 
 const Singleton = (() => {
   let instance
@@ -27,12 +27,11 @@ const Singleton = (() => {
       })
     }
 
-    const txRun = (tx) => async function (
-      cypher, params, resolve = NOOP, reject = LOG_ERROR) {
+    const txRun = (tx) => async function (cypher, params) {
       try {
         return tx.run(cypher, params)
       } catch (error) {
-        console.log(error)
+        log.error(error, 'Error running transaction ${cypher}')
       }
     }
 
@@ -42,7 +41,7 @@ const Singleton = (() => {
         session.close()
         return result
       } catch (error) {
-        console.log(error)
+        log.error(error, 'Error running transaction ${cypher}')
       }
     }
 

@@ -54,16 +54,14 @@ describe('model', () => {
 
     const result = new Commands()
     createCyphers(result, STRUCTURE)
-    console.log(result)
 
-    expect(result.createRelations.length).toBe(3)
-    expect(result.createNodes.length).toBe(4)
+    expect(result.getStatistic()).toEqual({'Label': 4, 'Node': 2, 'Reference': 2, 'Relation': 3})
   })
 
   it('should parse structure 2', () => {
     const commands = new Commands()
     createCyphers(commands, STRUCTURE2)
-    commands.writeToConsole()
+    expect(commands.getStatistic()).toEqual({'Label': 196, 'Node': 71, 'Reference': 125, 'Relation': 195})
   })
 })
 

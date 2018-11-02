@@ -92,14 +92,26 @@ export class Commands {
   constructor () {
     this.commands = []
     this.labels = new Set()
+    this.statistic = {
+      Node: 0,
+      Reference: 0,
+      Relation: 0,
+      Label: 0
+    }
   }
+
+  getStatistic = () => this.statistic
+  count = (type) => this.statistic[type] = this.statistic[type] + 1
+  writeStatistic = () => Object.keys(this.statistic).map(key => `${key}: ${this.statistic[key]}`).join('\n')
 
   add = command => {
     this.commands.push(command)
+    this.count(command.getType())
   }
 
   addLabel = label => {
     this.labels.add(label)
+    this.count('Label')
   }
 
   getCommands = type => this.commands.filter(e => e.getType() === type)
@@ -108,7 +120,6 @@ export class Commands {
 
   writeFile = (filename, cb) => {
     const ws = fs.createWriteStream(filename)
-    let error = null
 
     ws.on('finish', () => {
       cb(null)
@@ -127,7 +138,7 @@ export class Commands {
           if (command.getResolvedCommand) {
             ws.write(`${command.getResolvedCommand()};\n`)
           } else {
-            console.log('>>>>> COMMAND: ', command)
+            console.log('>>>>> COMMAND: ', command) // eslint-disable-line no-console
           }
         })
       })
@@ -138,6 +149,7 @@ export class Commands {
     }
   }
 
+  /* eslint-disable no-console */
   writeToConsole = () => {
     this.labels.forEach(label => {
       console.log(createIndex(label))
@@ -149,7 +161,9 @@ export class Commands {
         console.log('>>>>> COMMAND: ', command)
       }
     })
+    console.log(this.writeStatistic())
   }
+  /* eslint-enable */
 
   getJob = () => {
     return new Job(this)
