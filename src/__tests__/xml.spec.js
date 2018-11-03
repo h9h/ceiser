@@ -1,13 +1,10 @@
 import { parse } from '../xml'
-import Logger from '../Logger'
-
-const log = Logger('xml.spec')
+import log from '../Logger'
 
 describe('XML Parsing', () => {
   it('should parse XML', function () {
     const json = parse(XML1)
-    log.info({ json }, 'Parse result')
-    //console.log(json)
+    log.debug('Parse result', { json })
     expect(json.Model).toBeDefined()
     expect(json.Model.WSDL11ServiceInterface.status).toEqual('STABLE')
   })

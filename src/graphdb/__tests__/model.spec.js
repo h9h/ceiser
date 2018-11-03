@@ -61,7 +61,7 @@ describe('model', () => {
   it('should parse structure 2', () => {
     const commands = new Commands()
     createCyphers(commands, STRUCTURE2)
-    expect(commands.getStatistic()).toEqual({'Label': 196, 'Node': 71, 'Reference': 125, 'Relation': 195})
+    expect(commands.getStatistic()).toEqual({'Label': 13, 'Node': 71, 'Reference': 125, 'Relation': 195})
   })
 })
 

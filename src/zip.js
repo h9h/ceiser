@@ -1,13 +1,11 @@
 import fs from 'fs'
 import JSZip from 'jszip'
-import Logger from './Logger'
-
-const log = Logger('zip')
+import log from './Logger'
 
 export const listZipEntries = zipfile => new Promise((resolve, reject) => {
   fs.readFile(zipfile, (error, data) => {
     if (error) {
-      log.error(error, 'Reading zip failed')
+      log.error('Reading zip failed', error)
       reject(error)
     }
     JSZip.loadAsync(data).then(resolve)
@@ -26,7 +24,7 @@ export const readEntries = (zipfile, {
   return new Promise((resolve, reject) => {
     fs.readFile(zipfile, (error, data) => {
       if (error) {
-        log.error(error, 'Reading zip failed')
+        log.error('Reading zip failed', error)
         reject(error)
       }
 
@@ -34,6 +32,7 @@ export const readEntries = (zipfile, {
         const readEntries = Object.keys(zip.files).
           filter(filterFunction).
           map(filename => {
+            log.trace('Zipentry', { filename })
             return new Promise((resolve, reject) => {
               zip.file(filename).
                 async('string').

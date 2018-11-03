@@ -1,10 +1,7 @@
-import Logger from './Logger'
-
-const log = Logger('ERROR')
+import log from './Logger'
 
 export const throwParseError = (message, json) => {
-  const error = new Error('PARSE_ERROR: ' + message)
-  log.warn({ json }, 'PARSE_ERROR: ' + message)
-  console.log('ERROR', message, json)  // eslint-disable-line no-console
+  const error = new Error(message)
+  log.error(message, { json })
   throw error
 }

@@ -1,39 +1,53 @@
-import log from 'roarr'
-import serializeError from 'serialize-error'
+import fs from 'fs'
+import tracer from 'tracer'
+import dotenv from 'dotenv'
+dotenv.config()
 
-const Logger = source => {
-  const context = {
-    package: '@h9h/ceiser',
-    logLevel: 10,
-    source,
+
+const Logger = (() => {
+  let instance
+
+  const createInstance = () => {
+    const traceLog = tracer.console({
+      level: 'debug',
+      inspectOpt: {
+        depth : 10
+      },
+      transport : data => {
+        fs.createWriteStream("./stream.log", {
+          flags: "a",
+          encoding: "utf8",
+        }).write(data.rawoutput+"\n")
+      }
+    })
+
+    const logLog = tracer.colorConsole({
+      inspectOpt: {
+        depth : 10
+      }
+    })
+
+    tracer.setLevel(process.env.LOGLEVEL || 'info')
+
+    return {
+      setLevel: tracer.setLevel,
+      trace: traceLog.trace,
+      debug: traceLog.debug,
+      info: logLog.info,
+      warn: logLog.warn,
+      error: logLog.error,
+      fatal: logLog.fatal,
+    }
   }
 
   return {
-    trace: log.child({
-      ...context,
-      logLevel: 10,
-    }),
-    debug: log.child({
-      ...context,
-      logLevel: 20,
-    }),
-    info: log.child({
-      ...context,
-      logLevel: 30,
-    }),
-    warn: log.child({
-      ...context,
-      logLevel: 40,
-    }),
-    error: (error, message) => log.child({
-      ...context,
-      logLevel: 50,
-    })({error: serializeError(error)}, message),
-    fatal: log.child({
-      ...context,
-      logLevel: 60,
-    }),
+    getInstance: () => {
+      if (!instance) {
+        instance = createInstance()
+      }
+      return instance
+    }
   }
-}
+})()
 
-export default Logger
+export default Logger.getInstance()

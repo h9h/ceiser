@@ -1,10 +1,5 @@
 import { v1 as neo4j } from 'neo4j-driver'
-import Logger from '../Logger'
-import dotenv from 'dotenv'
-
-dotenv.config()
-
-const log = Logger('graphdb')
+import log from '../Logger'
 
 const NOOP = () => {}
 const LOG_ERROR = (error) => log.error(error, 'DB Call failed')
@@ -13,7 +8,7 @@ const Singleton = (() => {
   let instance
 
   const createInstance = () => {
-    log.info('---> Creating Neo4j Driver Instance <---')
+    log.trace('---> Creating Neo4j Driver Instance <---')
     const driver = neo4j.driver('bolt://' + process.env.NEO4J_HOST,
       neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD))
 
@@ -31,7 +26,7 @@ const Singleton = (() => {
       try {
         return tx.run(cypher, params)
       } catch (error) {
-        log.error(error, 'Error running transaction ${cypher}')
+        log.error(`Error running transaction ${cypher}`, error)
       }
     }
 
@@ -41,7 +36,7 @@ const Singleton = (() => {
         session.close()
         return result
       } catch (error) {
-        log.error(error, 'Error running transaction ${cypher}')
+        log.error('Error committing', error)
       }
     }
 

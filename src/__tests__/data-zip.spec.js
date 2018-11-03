@@ -1,5 +1,6 @@
 import { getJsonModel, zipToNeo4j } from '../data-zip'
 import util from 'util'
+import log from '../Logger'
 
 describe('CEISeR`s data.zip', () => {
   it('should read ceiser data.zip into json', function (done) {
@@ -9,7 +10,7 @@ describe('CEISeR`s data.zip', () => {
         expect(jsons[0]).toBeDefined()
         expect(jsons[17654]).toBeDefined()
         expect(jsons[5555].OperationQosProfile.name).toEqual('getBenutzerdaten')
-        console.log(util.inspect(jsons[5555], false, null)) // eslint-disable-line no-console
+        log.trace(jsons[5555])
         done()
       })
       .catch(error => {

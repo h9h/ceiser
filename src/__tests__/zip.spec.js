@@ -1,7 +1,5 @@
 import { listZipEntries, readEntries } from '../zip'
-import Logger from '../Logger'
-
-const log = Logger('zip.spec')
+import log from '../Logger'
 
 describe('handling von Zip-Datei', () => {
   it('should list zip-file entries', function (done) {
@@ -9,7 +7,7 @@ describe('handling von Zip-Datei', () => {
       expect(Object.keys(zip.files).length).toBe(27624)
       done()
     }).catch(error => {
-      log.error(error, 'Test failed')
+      log.error('Test failed', error)
       done(error)
     })
   }, 2000)
@@ -19,12 +17,12 @@ describe('handling von Zip-Datei', () => {
       filterFunction: name => name === 'de/svi/xsd/beratung/candidate/ei/common/v1@ServiceNamespace.xceiser'
     })
       .then(contents => {
-        log.info({contents}, 'Read contents')
+        log.info('Read contents', { contents })
         expect(contents.length).toBe(1)
         done()
       })
       .catch(error => {
-        log.error(error, 'Test failed')
+      log.error('Test failed', error)
         done(error)
       })
   }, 2000)
@@ -32,12 +30,11 @@ describe('handling von Zip-Datei', () => {
   it('should read zip-file entries (default entries)', function (done) {
     readEntries('./data/data.zip')
       .then(contents => {
-        log.info({contentsLength: contents.length}, 'Read contents')
         expect(contents.length).toBe(17655)
         done()
       })
       .catch(error => {
-        log.error(error, 'Test failed')
+      log.error('Test failed', error)
         done(error)
       })
   }, 10000)
@@ -45,12 +42,11 @@ describe('handling von Zip-Datei', () => {
   it('should apply filterfunction', function (done) {
     readEntries('./data/data.zip', {filterFunction: name => name.match(/.*ServiceNamespace.xceiser$/)})
       .then(contents => {
-        log.info({contentsLength: contents.length}, 'Read contents')
         expect(contents.length).toBe(2439)
         done()
       })
       .catch(error => {
-        log.error(error, 'Test failed')
+        log.error('Test failed', error)
         done(error)
       })
   }, 10000)
@@ -61,7 +57,6 @@ describe('handling von Zip-Datei', () => {
       applyFunction: content => content.substring(0, 100)
     })
       .then(contents => {
-        log.info({contentsLength: contents.length}, 'Read contents')
         expect(contents.length).toBe(2439)
         expect(contents[0].length).toBe(100)
         expect(contents[30].length).toBe(100)
@@ -69,7 +64,7 @@ describe('handling von Zip-Datei', () => {
         done()
       })
       .catch(error => {
-        log.error(error, 'Test failed')
+        log.error('Test failed', error)
         done(error)
       })
   }, 10000)

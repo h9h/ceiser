@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-const util = require('util')
-const commandLineArgs = require('command-line-args')
-const commandLineUsage = require('command-line-usage')
-const generateKuK = require('./data-zip').generate
+import util from 'util'
+import commandLineArgs from 'command-line-args'
+import commandLineUsage from 'command-line-usage'
+import { generate as generateKuK } from './data-zip'
 
 const fs = require('fs')
 

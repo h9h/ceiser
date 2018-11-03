@@ -1,7 +1,5 @@
 import { throwParseError } from '../Error'
-import Logger from '../Logger'
-
-const log = Logger('data-parseCEISeR')
+import log from '../Logger'
 
 const createNode = (label, content, parentFqn) => {
   const namespace = content.namespace || parentFqn
@@ -18,7 +16,7 @@ const createNode = (label, content, parentFqn) => {
   if (Object.keys(properties).length > 0) node.properties = properties
   if (relatedBy.length > 0) node.relatedBy = relatedBy
 
-  log.trace({content, node}, 'Finished parsing json, returning node')
+  log.trace('Finished parsing json, returning node', {content, node})
   return node
 }
 
@@ -27,6 +25,7 @@ const flatten = array => array.reduce(
 )
 
 export const parseJSON = (json, parentFqn) => {
+  log.trace('Parsing json', { json, parentFqn })
   if (parentFqn === '' || parentFqn == null) parentFqn = json[Object.keys(json)[0]].namespace
 
   const label = getLabel(json)

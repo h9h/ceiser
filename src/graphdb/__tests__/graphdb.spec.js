@@ -1,4 +1,5 @@
 import graphdb from '../graphdb'
+import log from '../../Logger'
 
 describe('graphdb', () => {
   let db
@@ -11,7 +12,7 @@ describe('graphdb', () => {
   })
 
   const logAndDone = done => (args) => {
-    console.log(args) // eslint-disable-line no-console
+    log.debug(args)
     done()
   }
   it('should get a single instance', function () {
