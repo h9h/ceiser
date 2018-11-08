@@ -33,7 +33,8 @@ const options = command => {
       return [
         { name: 'file', alias: 'f', type: File },
         { name: 'indices', alias: 'i', type: Boolean, defaultValue: false },
-        { name: 'batchsize', alias: 'b', type: Number, defaultValue: 1000 }
+        { name: 'batchsize', alias: 'b', type: Number, defaultValue: 1000 },
+        { name: 'todb', alias: 'd', type: Boolean, defaultValue: false },
       ]
     default:
       return []
@@ -72,7 +73,6 @@ const help = () => {
         { colA: 'prepare', colB: commandHelp('prepare') },
         { colA: 'generate', colB: commandHelp('generate') },
         { colA: 'clear', colB: commandHelp('clear') },
-        { colA: 'generate', colB: commandHelp('generate') },
       ]
     },
     {
@@ -94,8 +94,9 @@ const generate = (commandOptions) => {
   const filename = commandOptions.file.filename
   const includeIndices = commandOptions.indices
   const batchSize = commandOptions.batchsize
+  const toFile = !commandOptions.todb
 
-  generateKuK(filename, includeIndices, batchSize, done)
+  generateKuK(filename, includeIndices, batchSize, toFile, done)
 }
 
 const clear = () => {

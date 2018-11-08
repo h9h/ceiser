@@ -24,9 +24,9 @@ export const getCyphers = structures => {
   return commands
 }
 
-export const generate = (zipfile, includeIndices, batchSize, callback) => {
-  log.info('generate', { zipfile, includeIndices, batchSize })
-  const db = graphdb.getInstance()
+export const generate = (zipfile, includeIndices, batchSize, toFile, callback) => {
+  log.info('generate', { zipfile, includeIndices, batchSize, toFile })
+  const db = toFile ? null : graphdb.getInstance()
   zipToNeo4j(db, zipfile, includeIndices, batchSize, callback)
 }
 

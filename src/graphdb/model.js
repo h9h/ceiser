@@ -18,6 +18,7 @@ const createOrUpdateNode = (label, properties) => {
   if (keepKeys.length > 0) {
     return `
 MERGE (n:${label} { fqn: {fqn} })
+ON CREATE SET n += ${map(params)}
 ON MATCH SET n += ${map(params)}`
   } else {
     return `MERGE (n:${label} { fqn: {fqn} })`
