@@ -50,7 +50,8 @@ class Job {
     })
 
     ;['Node', 'Reference', 'Relation'].forEach(type => {
-      const sorted = commands.getCommands(type).sort((a, b) => a.text.localeCompare(b.text))
+      const sorted = commands.getCommands(type).
+        sort((a, b) => a.text.localeCompare(b.text))
       sorted.forEach(action => this.actions.push(action))
     })
   }
@@ -97,13 +98,15 @@ export class Commands {
       Node: 0,
       Reference: 0,
       Relation: 0,
-      Label: 0
+      Label: 0,
     }
   }
 
   getStatistic = () => this.statistic
   count = (type) => this.statistic[type] = this.statistic[type] + 1
-  writeStatistic = () => Object.keys(this.statistic).map(key => `${key}: ${this.statistic[key]}`).join('\n')
+  writeStatistic = () => Object.keys(this.statistic).
+    map(key => `${key}: ${this.statistic[key]}`).
+    join('\n')
 
   add = command => {
     this.commands.push(command)
@@ -177,19 +180,23 @@ export const createCyphers = (commands, structure) => {
 }
 
 const parseNextElement = (commands, structure, labelFrom, fqnFrom) => {
-  const {type} = structure
+  const {fqn, type} = structure
 
   switch (type) {
     case 'Node':
     case 'Reference': {
       const {label, fqn} = structure
-      const properties = structure.properties || {}
-      const params = {fqn, ...properties}
 
-      commands.addLabel(label)
-      commands.add(
-        new Command(type, createOrUpdateNode(label, params).replace(/\n/g, ' '),
-          params))
+      if (type === 'Node') {
+        const properties = structure.properties || {}
+        const params = {fqn, ...properties}
+
+        commands.addLabel(label)
+        commands.add(
+          new Command(type,
+            createOrUpdateNode(label, params).replace(/\n/g, ' '),
+            params))
+      }
 
       if (structure.relatedBy) {
         const {relatedBy} = structure

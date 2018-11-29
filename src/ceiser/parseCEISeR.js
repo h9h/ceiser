@@ -3,7 +3,7 @@ import log from '../Logger'
 
 const createNode = (label, content, parentFqn) => {
   log.trace('createNode', label, parentFqn, content)
-  const namespace = content.namespace || parentFqn
+  const namespace = content.namespace || parentFqn.split(':').join('.')
   const fqn = getFqn(content, namespace)
   const properties = getProperties(content)
 
