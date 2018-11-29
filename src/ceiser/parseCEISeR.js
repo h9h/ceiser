@@ -2,9 +2,11 @@ import { throwParseError } from '../Error'
 import log from '../Logger'
 
 const createNode = (label, content, parentFqn) => {
+  log.trace('createNode', label, parentFqn, content)
   const namespace = content.namespace || parentFqn
   const fqn = getFqn(content, namespace)
   const properties = getProperties(content)
+
   const relatedBy = getRelations(content, fqn)
 
   const node = {
@@ -72,14 +74,18 @@ const getFqn = (content, namespace) => {
 }
 
 const getProperties = content => {
-  const keys = Object.keys(content).filter(key => !['name', 'namespace', 'ID'].includes(key))
+  // ID wird schon als Referenz verwendet, hier rausfiltern
+  const keys = Object.keys(content).filter(key => !['ID'].includes(key))
+  // wenn der Wert ein Object ist, dann sind wir nicht bei Properties, sondern Relations
   const props = Object.entries(content).filter(([key, value]) => keys.includes(key) && typeof value !== 'object')
+
   const result = {}
   props.forEach(([key, value]) => result[key] = value)
   return result
 }
 
 const getRelations = (content, parentFqn) => {
+  // hier interessieren und nur die Object-Werte --> diese werden zu Relationen
   const entries = Object.entries(content).filter(([_, value]) => typeof value === 'object') // eslint-disable-line no-unused-vars
 
   return entries.map(([key, value]) => {

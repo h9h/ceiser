@@ -90,7 +90,12 @@ const prepare = () => {
 }
 
 const generate = (commandOptions) => {
-  const done = (result) => console.log('Finished. \n' + util.inspect(result, false, null))
+  process.on('exit', () => console.log('Exiting process'))
+  const done = (result) => {
+    console.log('Finished. \n' + util.inspect(result, false, null))
+    process.exit()
+  }
+
   const filename = commandOptions.file.filename
   const includeIndices = commandOptions.indices
   const batchSize = commandOptions.batchsize

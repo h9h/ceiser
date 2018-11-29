@@ -14,10 +14,10 @@ const Logger = (() => {
         depth : 10
       },
       transport : data => {
-        fs.createWriteStream("./stream.log", {
-          flags: "a",
-          encoding: "utf8",
-        }).write(data.rawoutput+"\n")
+        fs.createWriteStream('./stream.log', {
+          flags: 'a',
+          encoding: 'utf8',
+        }).write(data.rawoutput+'\n')
       }
     })
 
