@@ -1,2 +1,2 @@
-node lib\main generate --file D:\dev\ceiser\data\data.zip
+node lib\main generate --file C:\dev\ceiser\data\data.zip
 pause
