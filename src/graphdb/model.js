@@ -33,7 +33,7 @@ const relateNodes = (labelFrom, relation, labelTo, properties) => {
   return `
 MATCH (from:${labelFrom} { fqn: {fqnFrom} }),
 (to:${labelTo} { fqn: {fqnTo} })
-MERGE (from)-[r:${relation}]->(to)`
+CREATE (from)-[r:${relation}]->(to)`
 }
 
 class Job {
