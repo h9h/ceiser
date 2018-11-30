@@ -42,3 +42,14 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
       labels(m) as to,
       count(*) as freq
 ```
+
+## Installation
+APOC
+
+Installiere APOC durch kopieren des Jars in das neo4j/plugin Verzeichnis.
+
+Erlaube APOC Procedures durch folgende Teile in conf/neo4j.conf:
+
+```
+dbms.security.procedures.unrestricted=apoc.*
+```

@@ -180,7 +180,7 @@ export const createCyphers = (commands, structure) => {
 }
 
 const parseNextElement = (commands, structure, labelFrom, fqnFrom) => {
-  const {fqn, type} = structure
+  const {type} = structure
 
   switch (type) {
     case 'Node':
