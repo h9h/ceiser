@@ -81,6 +81,20 @@ const getProperties = content => {
 
   const result = {}
   props.forEach(([key, value]) => result[key] = value)
+
+  // additionalProperties ziehen wir als normale Properties raus
+  if (result.additionalProperties) {
+    const { additionalProperties } = result
+    additionalProperties.aplit(',').forEach(property => {
+      const parts = property.split('=')
+      if (parts.length !== 2) {
+        log.error('Error parsing additional properties', additionalProperties, property)
+      } else {
+        result[parts[0].trim()] = parts[1].trim()
+      }
+    })
+  }
+
   return result
 }
 
