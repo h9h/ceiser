@@ -3,6 +3,8 @@ import JSZip from 'jszip'
 import iconv from 'iconv-lite'
 import log from './Logger'
 
+iconv.skipDecodeWarning = true
+
 export const listZipEntries = zipfile => new Promise((resolve, reject) => {
   fs.readFile(zipfile, (error, data) => {
     if (error) {
@@ -29,17 +31,15 @@ export const readEntries = (zipfile, {
         reject(error)
       }
 
-      JSZip.loadAsync(data, {
-        decodeFileName: bytes => iconv.decode(bytes, 'ISO-8859-1')
-      }).then(zip => {
+      JSZip.loadAsync(data).then(zip => {
         const readEntries = Object.keys(zip.files).
           filter(filterFunction).
           map(filename => {
             log.trace('Zipentry', { filename })
             return new Promise((resolve, reject) => {
               zip.file(filename).
-                async('string').
-                then(content => resolve(applyFunction(content))).
+                async('binarystring').
+                then(content => resolve(applyFunction(iconv.decode(content, 'ISO-8859-1')))).
                 catch(reject)
             })
           })

@@ -3,7 +3,7 @@ import log from '../Logger'
 
 const createNode = (label, content, parentFqn) => {
   log.trace('createNode', label, parentFqn, content)
-  const namespace = content.namespace || parentFqn.split(':').join('.')
+  const namespace = content.namespace || parentFqn
   const fqn = getFqn(content, namespace)
   const properties = getProperties(content)
 
@@ -66,9 +66,9 @@ const getType = content => {
 }
 
 const getFqn = (content, namespace) => {
-  if (content.ID) return content.ID
+  if (content.ID) return content.ID.split(':').join('.')
   if (content.name) {
-    return namespace + ':' + content.name
+    return (namespace + '.' + content.name).split(':').join('.')
   }
   throwParseError('getFqn ergab keinen fully qualified name', content)
 }
