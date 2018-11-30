@@ -1,5 +1,4 @@
 import { getJsonModel, zipToNeo4j } from '../data-zip'
-import util from 'util'
 import log from '../Logger'
 
 describe('CEISeR`s data.zip', () => {

@@ -32,19 +32,19 @@ export const readEntries = (zipfile, {
       }
 
       JSZip.loadAsync(data).then(zip => {
-        const readEntries = Object.keys(zip.files).
+        const promiseHandleZipEntries = Object.keys(zip.files).
           filter(filterFunction).
           map(filename => {
             log.trace('Zipentry', { filename })
-            return new Promise((resolve, reject) => {
+            return new Promise((itemResolve, itemReject) => {
               zip.file(filename).
                 async('binarystring').
-                then(content => resolve(applyFunction(iconv.decode(content, 'ISO-8859-1')))).
-                catch(reject)
+                then(content => itemResolve(applyFunction(iconv.decode(content, 'ISO-8859-1')))).
+                catch(itemReject)
             })
           })
 
-        Promise.all(readEntries).then(resolve).catch(reject)
+        Promise.all(promiseHandleZipEntries).then(resolve).catch(reject)
       })
     })
   })

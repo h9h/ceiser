@@ -27,8 +27,8 @@ function File(filename){
   return new FileDetails(filename)
 }
 
-const options = command => {
-  switch (command) {
+const options = cmd => {
+  switch (cmd) {
     case 'generate':
       return [
         { name: 'file', alias: 'f', type: File },
@@ -41,8 +41,8 @@ const options = command => {
   }
 }
 
-const commandHelp = command => {
-  switch (command) {
+const commandHelp = cmd => {
+  switch (cmd) {
     case 'help':
       return 'diese Hilfe'
     case 'prepare':
@@ -89,19 +89,19 @@ const prepare = () => {
   console.log('prepare t.b.d.')
 }
 
-const generate = (commandOptions) => {
+const generate = (parameters) => {
   process.on('exit', () => console.log('Exiting process'))
   const done = (result) => {
     console.log('Finished. \n' + util.inspect(result, false, null))
     process.exit()
   }
 
-  const filename = commandOptions.file.filename
-  const includeIndices = commandOptions.indices
-  const batchSize = commandOptions.batchsize
-  const toFile = !commandOptions.todb
+  const filename = parameters.file.filename
+  const includeIndices = parameters.indices
+  const batchSize = parameters.batchsize
+  const toFile = !parameters.todb
 
-  generateKuK(filename, includeIndices, batchSize, toFile, done)
+  generateKuK(done, toFile, { filename, includeIndices, batchSize })
 }
 
 const clear = () => {

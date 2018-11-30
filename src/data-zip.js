@@ -24,13 +24,13 @@ export const getCyphers = structures => {
   return commands
 }
 
-export const generate = (zipfile, includeIndices, batchSize, toFile, callback) => {
+export const generate = (callback, toFile, { zipfile, includeIndices, batchSize }) => {
   log.info('generate', { zipfile, includeIndices, batchSize, toFile })
   const db = toFile ? null : graphdb.getInstance()
-  zipToNeo4j(db, zipfile, includeIndices, batchSize, callback)
+  zipToNeo4j(callback, db, { zipfile, includeIndices, batchSize })
 }
 
-export const zipToNeo4j = (db, zipfile, includeIndices, batchSize, callback) => {
+export const zipToNeo4j = (callback, db, { zipfile, includeIndices, batchSize } ) => {
   log.info('zip to neo4j', { zipfile, includeIndices, batchSize })
   getJsonModel(zipfile).then(async jsons => {
     const structures = getStructures(jsons)

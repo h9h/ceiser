@@ -179,45 +179,53 @@ export const createCyphers = (commands, structure) => {
   parseNextElement(commands, structure, label, fqn)
 }
 
+const parseNodeOrReference = (commands, structure) => {
+  const {type, label, fqn} = structure
+
+  if (type === 'Node') {
+    const properties = structure.properties || {}
+    const params = {fqn, ...properties}
+
+    commands.addLabel(label)
+    commands.add(
+      new Command(type,
+        createOrUpdateNode(label, params).replace(/\n/g, ' '),
+        params))
+  }
+
+  if (structure.relatedBy) {
+    const {relatedBy} = structure
+    if (Array.isArray(relatedBy)) {
+      relatedBy.forEach(o => parseNextElement(commands, o, label, fqn))
+    } else {
+      parseNextElement(commands, relatedBy, label, fqn)
+    }
+  }
+}
+
+const parseRelation = (commands, structure, fqnFrom, labelFrom) => {
+  const {type, label, relatedTo} = structure
+  const nodes = Array.isArray(relatedTo) ? relatedTo : [relatedTo]
+  nodes.forEach(node => {
+    const properties = {fqnFrom, fqnTo: node.fqn}
+    commands.add(new Command(type,
+      relateNodes(labelFrom, label, node.label, properties).
+        replace(/\n/g, ' '), properties))
+    parseNextElement(commands, node, labelFrom, fqnFrom)
+  })
+}
+
 const parseNextElement = (commands, structure, labelFrom, fqnFrom) => {
   const {type} = structure
 
   switch (type) {
     case 'Node':
-    case 'Reference': {
-      const {label, fqn} = structure
-
-      if (type === 'Node') {
-        const properties = structure.properties || {}
-        const params = {fqn, ...properties}
-
-        commands.addLabel(label)
-        commands.add(
-          new Command(type,
-            createOrUpdateNode(label, params).replace(/\n/g, ' '),
-            params))
-      }
-
-      if (structure.relatedBy) {
-        const {relatedBy} = structure
-        if (Array.isArray(relatedBy)) {
-          relatedBy.forEach(o => parseNextElement(commands, o, label, fqn))
-        } else {
-          parseNextElement(commands, relatedBy, label, fqn)
-        }
-      }
-    }
+    case 'Reference':
+      parseNodeOrReference(commands, structure)
       break
+
     case 'Relation': {
-      const {label, relatedTo} = structure
-      const nodes = Array.isArray(relatedTo) ? relatedTo : [relatedTo]
-      nodes.forEach(node => {
-        const properties = {fqnFrom, fqnTo: node.fqn}
-        commands.add(new Command(type,
-          relateNodes(labelFrom, label, node.label, properties).
-            replace(/\n/g, ' '), properties))
-        parseNextElement(commands, node, labelFrom, fqnFrom)
-      })
+      parseRelation(commands, structure, fqnFrom, labelFrom)
     }
       break
     default:

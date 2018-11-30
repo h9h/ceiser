@@ -66,18 +66,24 @@
     },
     "extends": "eslint:recommended",
     "rules": {
+      "complexity": ["error", 5],
+      "no-console": "warn",
+      "no-throw-literal": "error",
+      "no-shadow": "error",
+      "max-params": ["error", 4],
+      "max-statements": ["error", 20],
+      "default-case": "error",
+      "quotes": [
+        "error",
+        "single"
+      ],
       "semi": [
         "error",
         "never",
         {
           "beforeStatementContinuationChars": "always"
         }
-      ],
-      "quotes": [
-        "error",
-        "single"
-      ],
-      "no-console": "warn"
+      ]
     },
     "env": {
       "browser": true,

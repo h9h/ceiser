@@ -73,6 +73,8 @@ const getFqn = (content, namespace) => {
   throwParseError('getFqn ergab keinen fully qualified name', content)
 }
 
+export const isBezeichner = name => /^[A-Za-z][\w$]*/g.test(name)
+
 const getProperties = content => {
   // ID wird schon als Referenz verwendet, hier rausfiltern
   const keys = Object.keys(content).filter(key => !['ID'].includes(key))
@@ -85,12 +87,14 @@ const getProperties = content => {
   // additionalProperties ziehen wir als normale Properties raus
   if (result.additionalProperties) {
     const { additionalProperties } = result
-    additionalProperties.aplit(',').forEach(property => {
+    additionalProperties.split(',').forEach(property => {
       const parts = property.split('=')
       if (parts.length !== 2) {
-        log.error('Error parsing additional properties', additionalProperties, property)
+        log.info('skipping additional properties', property)
       } else {
-        result[parts[0].trim()] = parts[1].trim()
+        if (isBezeichner(parts[0].trim())) {
+          result[parts[0].trim()] = parts[1].trim()
+        }
       }
     })
   }

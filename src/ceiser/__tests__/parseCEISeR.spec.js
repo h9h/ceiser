@@ -1,8 +1,16 @@
 import fs from 'fs'
-import util from 'util'
 import log from '../../Logger'
-import { parseJSON } from '../parseCEISeR'
+import { parseJSON, isBezeichner } from '../parseCEISeR'
 import { parse } from '../../xml'
+
+it('isBezeichner', () => {
+  expect(isBezeichner('$Ab01')).toBe(false)
+  expect(isBezeichner('Ab01')).toBe(true)
+  expect(isBezeichner('$Ab01')).toBe(false)
+  expect(isBezeichner('A$b01')).toBe(true)
+  expect(isBezeichner('a')).toBe(true)
+  expect(isBezeichner('$a')).toBe(false)
+})
 
 const FILES = [
   'data/leben/LebenVertragAuskunft1/LebenVertragAuskunftPortType1@WSDL11ServiceInterface.xceiser',
