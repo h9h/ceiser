@@ -68,7 +68,11 @@ const getType = content => {
 const getFqn = (content, namespace) => {
   if (content.ID) return content.ID.split(':').join('.')
   if (content.name) {
-    return (namespace + '.' + content.name).split(':').join('.')
+    if (namespace && namespace.length > 0) {
+      return (namespace + '.' + content.name).split(':').join('.')
+    } else {
+      return content.name
+    }
   }
   throwParseError('getFqn ergab keinen fully qualified name', content)
 }

@@ -7,9 +7,9 @@ Alle Label und Relationships:
 match n-[r]-() return distinct labels(n), type(r)
 ```
 
-Nodes ohne Relations:
+Nodes ohne Relations (Orphans):
 ```
-match (n)-[r?]-() where r is null return n
+match (n) where not (n)--() return n
 ```
 
 Alle Nodes with einer spezifischen Property:
