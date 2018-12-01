@@ -39,3 +39,8 @@ KDF-Elemente
 ```
 match (n) where n.namespace starts with "de.svi.kdf." return n
 ```
+
+Verwendetes Element
+```
+match (e:XSDElement {name: "schadenIdentNummer"})-[:usedComps]-() return e 
+```
