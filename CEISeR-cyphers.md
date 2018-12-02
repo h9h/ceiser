@@ -33,6 +33,11 @@ match (a)-[s:state]-()--(sc:ServiceContract) return a.name as Status, sc.name as
 match (sc:ServiceContract), (state:State { name: "Releasetestbereit" }), p=shortestPath((sc)-[*1..2]-(state)) return p
 ```
 
+bzw. für TechnicalServiceVersion:
+```
+match (s:State { fqn: 'de.svi.eam.status.ServiceStatusmodell.Releasetestbereit' }), (t:TechnicalServiceVersion), p=shortestPath((t)-[*1..3]-(s)) return p
+```
+
 ## KDM
 
 KDF-Elemente
