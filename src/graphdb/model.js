@@ -1,4 +1,5 @@
 import fs from 'fs'
+import log from '../Logger'
 
 const map = properties => {
   const keys = Object.keys(properties).map(key => `${key}: {${key}}`)
@@ -38,6 +39,8 @@ CREATE (from)-[r:${relation}]->(to)`
 
 class Job {
   constructor (commands, includeIndices, batchSize) {
+    this.start = new Date()
+    this.countJobs = 0
     this.finishedIndices = !includeIndices
     this.finished = false
     this.index = 0
@@ -56,9 +59,14 @@ class Job {
     })
   }
 
+  time = count => {
+    if (count % this.batchSize === 0) console.log(count, (new Date() - this.start) / 1000) // eslint-disable-line no-console
+  }
+
   isFinished = () => this.finished
 
   getBatch = () => {
+    log.trace(`Job ${++this.countJobs} start ${new Date()}`)
     if (!this.finishedIndices) {
       this.finishedIndices = true
       return this.indexActions
@@ -100,6 +108,8 @@ export class Commands {
       Relation: 0,
       Label: 0,
     }
+
+    this.addLabel('KdmElement')
   }
 
   getStatistic = () => this.statistic

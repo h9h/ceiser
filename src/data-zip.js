@@ -30,6 +30,68 @@ export const generate = (callback, toFile, { zipfile, includeIndices, batchSize 
   zipToNeo4j(callback, db, { zipfile, includeIndices, batchSize })
 }
 
+async function postCreateScripts (db) {
+  try {
+    const tx = db.transaction();
+    [
+      'MATCH (n:XSDType) WHERE n.fqn STARTS WITH "de.svi.kdf." SET n:KdmElement RETURN n',
+      'MATCH (n:XSDElement) WHERE n.fqn STARTS WITH "de.svi.kdf." SET n:KdmElement RETURN n',
+
+    ].forEach(async cypher => {
+      await tx.run(cypher, {})
+      log.info('executed post-create', { cypher })
+    })
+
+    await tx.commit()
+    log.info('Post-create commit')
+  } catch (e) {
+    log.error('Error in post-create', {e})
+  }
+}
+
+function queryDatabase (db) {
+  const query = `
+MATCH (n)
+RETURN
+DISTINCT labels(n),
+count(*) AS Anzahl,
+avg(size(keys(n))) as Avg_PropertyCount,
+min(size(keys(n))) as Min_PropertyCount,
+max(size(keys(n))) as Max_PropertyCount,
+avg(size( (n)-[]-() ) ) as Avg_RelationshipCount,
+min(size( (n)-[]-() ) ) as Min_RelationshipCount,
+max(size( (n)-[]-() ) ) as Max_RelationshipCount  `
+
+  db.run(query, {}, result => {
+    console.log(result) // eslint-disable-line no-console
+  })
+}
+
+async function createNodesAndRelations (db, job) {
+  let count = 0
+
+  // Fill database with nodes and relations
+  while (!job.isFinished()) {
+    const tx = db.transaction()
+
+    job.getBatch().forEach(async command => {
+      const {text, params} = command.getCommand()
+      const result = await tx.run(text, params)
+      log.trace('executed cypher', {result, command: command.getResolvedCommand()})
+      count = count + 1
+      job.time(count)
+    })
+
+    const result = await tx.commit()
+    if (result) {
+      log.info('Committed', {count})
+    } else {
+      log.error('Error in Commit?', {count})
+    }
+  }
+  return count
+}
+
 export const zipToNeo4j = (callback, db, { zipfile, includeIndices, batchSize } ) => {
   log.info('zip to neo4j', { zipfile, includeIndices, batchSize })
   getJsonModel(zipfile).then(async jsons => {
@@ -41,31 +103,14 @@ export const zipToNeo4j = (callback, db, { zipfile, includeIndices, batchSize } 
       commands.writeFile('cypher-coommands.txt', callback)
     } else {
       log.info('execute cyphers in neo4j')
-      let count = 0
       const job = commands.getJob(includeIndices, batchSize)
-
-      const now = new Date()
-      const countJobs = 0
-      while (!job.isFinished()) {
-        log.trace(`Job ${countJobs} start ${now}`)
-        const tx = db.transaction()
-
-        job.getBatch().forEach(async command => {
-          const {text, params} = command.getCommand()
-          const result = await tx.run(text, params)
-          log.trace('executed cypher', { result, command: command.getResolvedCommand() })
-          count = count + 1
-          if (count%batchSize === 0) console.log(count, (new Date() - now)/1000) // eslint-disable-line no-console
-        })
-
-        const result = await tx.commit()
-        if (result) {
-          log.info('Committed', { count })
-        } else {
-          log.error('Error in Commit?', { count })
-        }
-      }
+      let count = await createNodesAndRelations(db, job)
       console.log(`Anzahl Cypher-Commands abgesetzt: ${count}`) // eslint-disable-line no-console
+
+      await postCreateScripts(db)
+
+      queryDatabase(db)
+
       callback(commands.getStatistic())
     }
   })
