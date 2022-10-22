@@ -3,6 +3,7 @@ import util from 'util'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import { generate as generateKuK } from './data-zip'
+import { removeData } from './data-clear'
 
 const fs = require('fs')
 
@@ -101,11 +102,11 @@ const generate = (parameters) => {
   const batchSize = parameters.batchsize
   const toFile = !parameters.todb
 
-  generateKuK(done, toFile, { filename, includeIndices, batchSize })
+  generateKuK(done, toFile, { zipfile: filename, includeIndices, batchSize })
 }
 
 const clear = () => {
-  console.log('prepare t.b.d.')
+  removeData()
 }
 
 switch (command) {

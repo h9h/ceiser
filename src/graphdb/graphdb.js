@@ -1,4 +1,4 @@
-import { v1 as neo4j } from 'neo4j-driver'
+import neo4j from 'neo4j-driver'
 import log from '../Logger'
 
 const NOOP = () => {}
@@ -9,11 +9,12 @@ const Singleton = (() => {
 
   const createInstance = () => {
     log.trace('---> Creating Neo4j Driver Instance <---')
-    const driver = neo4j.driver('bolt://' + process.env.NEO4J_HOST,
+    const driver = neo4j.driver('neo4j://' + process.env.NEO4J_HOST,
       neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD))
 
     const sessionRun = (cypher, params, resolve = NOOP, reject = LOG_ERROR) => {
       const session = driver.session()
+
       session.run(cypher, params).then(result => {
         resolve(result)
         session.close()

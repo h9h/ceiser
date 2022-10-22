@@ -2,7 +2,7 @@ import fs from 'fs'
 import log from '../Logger'
 
 const map = properties => {
-  const keys = Object.keys(properties).map(key => `${key}: {${key}}`)
+  const keys = Object.keys(properties).filter(key => key.indexOf('$') == -1).map(key => `${key}: $${key}`)
   return `{ ${keys.join(', ')} }`
 }
 
@@ -18,11 +18,11 @@ const createOrUpdateNode = (label, properties) => {
 
   if (keepKeys.length > 0) {
     return `
-MERGE (n:${label} { fqn: {fqn} })
+MERGE (n:${label} { fqn: $fqn })
 ON CREATE SET n += ${map(params)}
 ON MATCH SET n += ${map(params)}`
   } else {
-    return `MERGE (n:${label} { fqn: {fqn} })`
+    return `MERGE (n:${label} { fqn: $fqn })`
   }
 }
 
@@ -32,8 +32,8 @@ const relateNodes = (labelFrom, relation, labelTo, properties) => {
   if (!properties.fqnTo) throw new Error(
     'Field fqnTo is missing from properties')
   return `
-MATCH (from:${labelFrom} { fqn: {fqnFrom} }),
-(to:${labelTo} { fqn: {fqnTo} })
+MATCH (from:${labelFrom} { fqn: $fqnFrom }),
+(to:${labelTo} { fqn: $fqnTo })
 CREATE (from)-[r:${relation}]->(to)`
 }
 
@@ -91,7 +91,7 @@ class Command {
   getResolvedCommand = () => {
     let result = this.text
     Object.keys(this.params).forEach(key => {
-      const re = new RegExp(`{${key}}`, 'g')
+      const re = new RegExp(`$${key}`, 'g')
       result = result.replace(re, `"${this.params[key]}"`)
     })
     return result

@@ -16,6 +16,7 @@ export const listZipEntries = zipfile => new Promise((resolve, reject) => {
 })
 
 export const filterConfigurationEvents = filename =>
+  filename.match(/.*\.xceiser$/) &&
   !filename.match(/.*ConfigurationEvent\.xceiser$/) &&
   !filename.match(/.*ConfigurationAction\.xceiser$/)
 

@@ -74,7 +74,10 @@ const getFqn = (content, namespace) => {
       return content.name
     }
   }
-  throwParseError('getFqn ergab keinen fully qualified name', content)
+
+  log.info('parse error getFQN?', { content, namespace })
+  return 'dummy.node'
+  //throwParseError('getFqn ergab keinen fully qualified name', content)
 }
 
 export const isBezeichner = name => /^[A-Za-z][\w$]*/g.test(name)
