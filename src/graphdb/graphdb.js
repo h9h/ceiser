@@ -34,7 +34,8 @@ const Singleton = (() => {
     const txCommit = (session, tx) => async function () {
       try {
         const result = await tx.commit()
-        session.close()
+        await tx.close()
+        await session.close()
         return result
       } catch (error) {
         log.error('Error committing', error)

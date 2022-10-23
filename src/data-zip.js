@@ -75,6 +75,7 @@ async function createNodesAndRelations (db, job) {
     const tx = db.transaction()
 
     job.getBatch().forEach(async command => {
+
       const {text, params} = command.getCommand()
       const result = await tx.run(text, params)
       log.trace('executed cypher', {result, command: command.getResolvedCommand()})
@@ -82,13 +83,11 @@ async function createNodesAndRelations (db, job) {
       job.time(count)
     })
 
-    const result = await tx.commit()
-    if (result) {
-      log.info('Committed', {count})
-    } else {
-      log.error('Error in Commit?', {count})
-    }
+    await tx.commit()
+
+    log.info('Committed', {count})
   }
+
   return count
 }
 
