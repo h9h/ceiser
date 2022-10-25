@@ -36,7 +36,7 @@ Bei mir liegt die Datei hier: `C:\ws\xplor-ws-17.6\Production\models\ceiser\cont
 ## Lade die Informationen in die Graph-DB
 
 ```
-node lib\main generate --file <Pfad zu data.zip>
+node lib\main generate --file <Pfad zu data.zip> --todb
 ```
 
 (z.B. `node lib\main generate --file C:\dev\ceiser\data\data.zip`)
