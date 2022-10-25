@@ -30,7 +30,7 @@ Bei mir liegt die Datei hier: `C:\ws\xplor-ws-17.6\Production\models\ceiser\cont
       ```
 2. Baue das Projekt
       ```
-      npm start build
+      npm run build
       ```
 
 ## Lade die Informationen in die Graph-DB
